@@ -3,11 +3,14 @@ package org.skyscreamer.nevado.jms.connector.amazonaws;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.services.sqs.AmazonSQSAsync;
 import com.amazonaws.services.sqs.model.*;
+
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
 import org.skyscreamer.nevado.jms.util.MessageIdUtil;
 
 import javax.jms.JMSException;
+
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
@@ -35,8 +38,19 @@ public class AmazonAwsSQSQueue implements SQSQueue {
 
     @Override
     public String sendMessage(String serializedMessage) throws JMSException {
+    	return this.sendMessage(serializedMessage, null);    	
+    }
+    
+    @Override
+    public String sendMessage(String serializedMessage, Map<String, MessageAttributeValue> messageAttributes) throws JMSException {
         String messageId;
         SendMessageRequest request = new SendMessageRequest(_queueUrl, serializedMessage);
+        
+        // Temp
+        print(messageAttributes);
+                
+        request.setMessageAttributes(messageAttributes);
+        
         try {
             if (_isAsync) {
                 ((AmazonSQSAsync)_amazonAwsSQSConnector.getAmazonSQS()).sendMessageAsync(request);
@@ -49,6 +63,15 @@ public class AmazonAwsSQSQueue implements SQSQueue {
             throw _amazonAwsSQSConnector.handleAWSException("Unable to send message to queue " + _queueUrl, e);
         }
         return messageId;
+    }
+    
+    @Deprecated
+    private void print(Map<String, MessageAttributeValue> messageAttributes){
+    	System.out.println("----------------------AmazonAwsSQSQueue.print----------------------------");
+    	for (Map.Entry<String, MessageAttributeValue> entry : messageAttributes.entrySet()) {
+        	System.out.println("entry key: " + entry.getKey() + " -> " + entry.getValue().toString() );
+    	}
+    	System.out.println("-------------------------------------------------------------------------");
     }
 
     @Override

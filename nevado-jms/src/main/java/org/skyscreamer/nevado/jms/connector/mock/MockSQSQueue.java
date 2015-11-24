@@ -5,8 +5,12 @@ import org.skyscreamer.nevado.jms.connector.SQSQueue;
 import org.skyscreamer.nevado.jms.destination.NevadoQueue;
 import org.skyscreamer.nevado.jms.util.RandomData;
 
+import com.amazonaws.services.sqs.model.MessageAttributeValue;
+
 import javax.jms.JMSException;
+
 import java.util.LinkedList;
+import java.util.Map;
 
 /**
  * Mock implementation of an SQSQueue.  Intended for testing and development.
@@ -36,6 +40,14 @@ public class MockSQSQueue implements SQSQueue, ResettableMock {
         MockSQSMessage message = new MockSQSMessage(body);
         _messageList.addLast(message);
         return message.getMessageId();
+    }
+    
+    @Override
+    public synchronized String sendMessage(String body, Map<String, MessageAttributeValue> messageAttributes) throws JMSException {
+    	checkIsDeleted();
+    	MockSQSMessage message = new MockSQSMessage(body);
+    	_messageList.addLast(message);
+    	return message.getMessageId();
     }
 
     @Override
