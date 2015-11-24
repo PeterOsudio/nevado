@@ -46,9 +46,6 @@ public class AmazonAwsSQSQueue implements SQSQueue {
         String messageId;
         SendMessageRequest request = new SendMessageRequest(_queueUrl, serializedMessage);
         
-        // Temp
-        print(messageAttributes);
-                
         request.setMessageAttributes(messageAttributes);
         
         try {
@@ -65,15 +62,6 @@ public class AmazonAwsSQSQueue implements SQSQueue {
         return messageId;
     }
     
-    @Deprecated
-    private void print(Map<String, MessageAttributeValue> messageAttributes){
-    	System.out.println("----------------------AmazonAwsSQSQueue.print----------------------------");
-    	for (Map.Entry<String, MessageAttributeValue> entry : messageAttributes.entrySet()) {
-        	System.out.println("entry key: " + entry.getKey() + " -> " + entry.getValue().toString() );
-    	}
-    	System.out.println("-------------------------------------------------------------------------");
-    }
-
     @Override
     public void setMessageVisibilityTimeout(String sqsReceiptHandle, int timeout) throws JMSException {
         try {

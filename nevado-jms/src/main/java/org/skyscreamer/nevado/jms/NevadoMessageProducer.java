@@ -1,7 +1,5 @@
 package org.skyscreamer.nevado.jms;
 
-import java.util.Enumeration;
-
 import org.skyscreamer.nevado.jms.destination.NevadoDestination;
 import org.skyscreamer.nevado.jms.message.NevadoMessage;
 
