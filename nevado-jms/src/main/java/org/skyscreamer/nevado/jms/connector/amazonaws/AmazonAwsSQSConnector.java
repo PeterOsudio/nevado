@@ -6,6 +6,7 @@ import com.amazonaws.ClientConfiguration;
 import com.amazonaws.Protocol;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.internal.StaticCredentialsProvider;
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSAsync;
 import com.amazonaws.services.sns.AmazonSNSAsyncClient;
@@ -17,6 +18,7 @@ import com.amazonaws.services.sqs.model.CreateQueueRequest;
 import com.amazonaws.services.sqs.model.CreateQueueResult;
 import com.amazonaws.services.sqs.model.ListQueuesRequest;
 import com.amazonaws.services.sqs.model.ListQueuesResult;
+
 import org.skyscreamer.nevado.jms.connector.AbstractSQSConnector;
 import org.skyscreamer.nevado.jms.connector.SQSMessage;
 import org.skyscreamer.nevado.jms.connector.SQSQueue;
@@ -31,13 +33,12 @@ import javax.jms.JMSException;
 import javax.jms.JMSSecurityException;
 import javax.jms.ResourceAllocationException;
 import javax.net.ssl.SSLException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Connector for SQS-only implementation of the Nevado JMS driver.
@@ -68,9 +69,8 @@ public class AmazonAwsSQSConnector extends AbstractSQSConnector {
         }  
         clientConfiguration.setProtocol(isSecure ? Protocol.HTTPS : Protocol.HTTP);
         if (isAsync) {
-            ExecutorService executorService = Executors.newSingleThreadExecutor();
-            _amazonSQS = new AmazonSQSAsyncClient(awsCredentials, clientConfiguration, executorService);
-            _amazonSNS = new AmazonSNSAsyncClient(awsCredentials, clientConfiguration, executorService);
+            _amazonSQS = new AmazonSQSAsyncClient(new StaticCredentialsProvider(awsCredentials), clientConfiguration);
+            _amazonSNS = new AmazonSNSAsyncClient(new StaticCredentialsProvider(awsCredentials), clientConfiguration);
         } else {
             _amazonSQS = new OVCAmazonSQSClient(awsCredentials, clientConfiguration);
             _amazonSNS = new AmazonSNSClient(awsCredentials, clientConfiguration);
